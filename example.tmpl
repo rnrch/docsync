@@ -1,0 +1,25 @@
+{{- define "toc"}}
+{{- . | folderTOC }}
+{{ range .Folders}}
+{{- template "toc" .}}
+{{- end}}
+{{- end }}
+{{- define "structure"}}
+{{ .Layer | layerToHeader }} {{ .Name }}
+{{ range .Files }}
+{{. | fileLinks }}
+{{- end }}
+{{ range .Folders }}
+{{- template "structure" . }}
+{{- end }}
+{{- end }}
+
+{{ template "toc" .Data -}}
+
+{{- if .ExcludeRoot }}
+{{- range .Data.Folders }}
+{{- template "structure" . -}}
+{{- end }}
+{{- else }}
+{{- template "structure" .Data -}}
+{{ end -}}
