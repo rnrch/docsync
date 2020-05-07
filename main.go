@@ -28,6 +28,7 @@ var (
 	folder      string
 	excludes    stringSlice
 	excludesAll stringSlice
+	ep          stringSlice
 )
 
 type stringSlice []string
@@ -64,6 +65,7 @@ func init() {
 	flag.Var(&tmpls, "f", "name of the template files")
 	flag.Var(&excludes, "e", "name of the subfolders to be excluded, use absolute path, otherwise means the folder under root folder")
 	flag.Var(&excludesAll, "ea", "name of subfolders to be excluded, use relative path")
+	flag.Var(&ep, "ep", "suffixes of files to be excluded")
 	flag.StringVar(&output, "o", "output.md", "name of the output file")
 	flag.StringVar(&folder, "d", pwd, "absolute path of the directory to process")
 	flag.Parse()
@@ -112,6 +114,17 @@ func inExcludesAll(dir string, excludesAll []string) bool {
 	return false
 }
 
+func fileInEp(name string, ep []string) bool {
+	s := strings.Split(name, ".")
+	p := s[len(s)-1]
+	for _, s := range ep {
+		if p == s {
+			return true
+		}
+	}
+	return false
+}
+
 func processDir(dir string, layer int) (*Folder, error) {
 	contents, err := ioutil.ReadDir(dir)
 	if err != nil {
@@ -137,7 +150,7 @@ func processDir(dir string, layer int) (*Folder, error) {
 			res.Folders = append(res.Folders, *subfolder)
 			continue
 		}
-		if !inExcludes(path.Join(dir, content.Name()), excludes) && !inExcludesAll(content.Name(), excludesAll) {
+		if !inExcludes(path.Join(dir, content.Name()), excludes) && !inExcludesAll(content.Name(), excludesAll) && !fileInEp(content.Name(), ep) {
 			res.Files = append(res.Files, path.Join(dir, content.Name()))
 		}
 	}

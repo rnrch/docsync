@@ -17,5 +17,6 @@ e.g.
 | f    | name of template file(s), make sure the first one specified by this flag is the final output template |
 | e    | absolute path of folders/files to be excluded                                                         |
 | ea   | name of  folders/files to be excluded                                                                 |
+| ep   | exclude files with all specified suffixes                                                             |
 | o    | name of the output file                                                                               |
 | d    | absolute path of the directory to process, current directory by default                               |
