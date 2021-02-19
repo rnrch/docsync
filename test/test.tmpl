@@ -1,0 +1,11 @@
+{{ define "folder" }}
+{{ .Depth | depthToHeader }} {{ .Name }}
+{{ range .SubFolders }}
+{{- template "folder" . }}
+{{- end }}
+{{- range .Files }}
+[{{ .Name }}]({{ .Path }})
+{{ end }}
+{{- end }}
+
+{{- template "folder" . }}
