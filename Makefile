@@ -1,12 +1,18 @@
-build:
-	go build -o docsync .
+build: clean
+	@echo "Begin to build binary"
+	./hack/build.sh
+.PHONY: build
 
 addlicense:
 	# install with `go get github.com/google/addlicense`
 	addlicense -c 'rnrch' -l apache -v .
+.PHONY: addlicense
 
 clean:
-	rm -f docsync
+	rm -rf bin
+.PHONY: clean
 
 test: build
-	./docsync -t test/test.tmpl -i ignore -o test/output.md -d test/test-folder
+	@echo "Begin to run test"
+	./hack/test.sh
+.PHONY: test

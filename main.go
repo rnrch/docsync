@@ -15,6 +15,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
@@ -23,6 +24,7 @@ import (
 	"text/template"
 
 	"github.com/jessevdk/go-flags"
+	"github.com/rnrch/docsync/pkg/version"
 	"github.com/rnrch/rlog"
 )
 
@@ -44,6 +46,7 @@ type Options struct {
 	Ignore    []string `long:"ignore" short:"i" description:"ignore files"`
 	Output    string   `long:"output" short:"o" description:"output file name" default:"output.md"`
 	Directory string   `long:"directory" short:"d" description:"directory to process"`
+	Version   bool     `long:"version" short:"v" description:"show version info"`
 }
 
 func ParseFlags() Options {
@@ -57,6 +60,9 @@ func ParseFlags() Options {
 			}
 		}
 		os.Exit(code)
+	}
+	if options.Version {
+		fmt.Println(version.Info(path.Base(os.Args[0])))
 	}
 	return options
 }
