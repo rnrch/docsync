@@ -18,6 +18,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"regexp"
 	"strings"
 	"text/template"
 
@@ -114,7 +115,12 @@ func processFolder(folder string, ignore []string, depth int) (Folder, error) {
 
 func contains(set []string, value string) bool {
 	for _, s := range set {
-		if s == value {
+		match, err := regexp.MatchString(s, value)
+		if err != nil {
+			rlog.Error(err, "regexp match")
+			continue
+		}
+		if match {
 			return true
 		}
 	}
