@@ -68,7 +68,6 @@ func ParseFlags() Options {
 }
 
 func main() {
-	rlog.SwtichMode(rlog.Development)
 	options := ParseFlags()
 	if options.Directory == "" {
 		pwd, err := os.Getwd()
