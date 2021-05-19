@@ -13,14 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 set -o nounset
 set -o errexit
 set -o pipefail
 
-curDir=$(cd "$(dirname "$0")" && pwd)
-cd "${curDir}" || exit 1
-. ./env.sh
+repo=$(basename -s .git "$(git config --get remote.origin.url)")
+source_path=$(cd "$(dirname "$0")" && cd .. && pwd)
+pushd "${source_path}" >/dev/null
 
-cd "${BUILD_SOURCE_HOME}" || exit 1
-./${BUILD_PATH}/${BINARY} -t test/test.tmpl -i ignore -o test/output.md -d test/test-folder -v
+./bin/"${repo}" -t test/test.tmpl -i ignore -o test/output.md -d test/test-folder
+
+popd >/dev/null

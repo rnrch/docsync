@@ -13,19 +13,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 set -o nounset
 set -o errexit
 set -o pipefail
 
-curDir=$(cd "$(dirname "$0")" && pwd)
-cd "${curDir}" || exit 1
-. ./env.sh
+repo=$(basename -s .git "$(git config --get remote.origin.url)")
+repo_path=github.com/rnrch/"${repo}"
 
-DATE=$(date "+%Y%m%d-%H:%M:%S")
-VERSION=$(git describe --tags "$(git rev-list --tags --max-count=1)")
-REVISION=$(git rev-parse --short HEAD)
-LDFLAGS="-X ${PKG}/pkg/version.version=${VERSION} -X ${PKG}/pkg/version.revision=${REVISION} -X ${PKG}/pkg/version.buildDate=${DATE}"
+source_path=$(cd "$(dirname "$0")" && cd .. && pwd)
+pushd "$source_path" >/dev/null
 
-cd "${BUILD_SOURCE_HOME}" || exit 1
-go build -o "${BUILD_SOURCE_HOME}/${BUILD_PATH}/${BINARY}"  -ldflags "${LDFLAGS}"
+date=$(date "+%Y%m%d-%H:%M:%S")
+version=$(git describe --tags --dirty 2>/dev/null || echo 'unknown')
+revision=$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown')
+branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo 'unknown')
+
+ldflags="
+  -X ${repo_path}/pkg/version.Version=${version}
+  -X ${repo_path}/pkg/version.Revision=${revision}
+  -X ${repo_path}/pkg/version.Branch=${branch}
+  -X ${repo_path}/pkg/version.BuildDate=${date}"
+
+echo "Building with -ldflags $ldflags"
+go build -ldflags "${ldflags}" -o "${source_path}/bin/${repo}" "${source_path}/cmd"
+
+popd >/dev/null

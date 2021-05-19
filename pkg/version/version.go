@@ -15,44 +15,39 @@
 package version
 
 import (
-	"bytes"
-	"html/template"
+	"encoding/json"
 	"runtime"
-	"strings"
+
+	"github.com/rnrch/rlog"
 )
 
+// Build information. Populated at build-time.
 var (
-	version   string
-	revision  string
-	buildDate string
-	goVersion = runtime.Version()
-	os        = runtime.GOOS
-	arch      = runtime.GOARCH
+	Version   string
+	Revision  string
+	Branch    string
+	BuildDate string
+	GoVersion = runtime.Version()
+	OS        = runtime.GOOS
+	Arch      = runtime.GOARCH
 )
 
-var versionInfoTmpl = `
-{{.program}} version  {{.version}}
-  Git commit:     {{.revision}}
-  Build date:     {{.buildDate}}
-  Go version:     {{.goVersion}}
-  OS/Arch:        {{.OS}}/{{.Arch}}
-`
+// Info provides the iterable version information.
+var Info = map[string]string{
+	"version":   Version,
+	"revision":  Revision,
+	"branch":    Branch,
+	"buildDate": BuildDate,
+	"goVersion": GoVersion,
+	"os":        OS,
+	"arch":      Arch,
+}
 
-func Info(program string) string {
-	m := map[string]string{
-		"program":   program,
-		"version":   version,
-		"revision":  revision,
-		"buildDate": buildDate,
-		"goVersion": goVersion,
-		"OS":        os,
-		"Arch":      arch,
+func String() string {
+	v, err := json.MarshalIndent(Info, "", "  ")
+	if err != nil {
+		rlog.Error(err, "marshal version info")
+		return ""
 	}
-	t := template.Must(template.New("version").Parse(versionInfoTmpl))
-
-	var buf bytes.Buffer
-	if err := t.ExecuteTemplate(&buf, "version", m); err != nil {
-		panic(err)
-	}
-	return strings.TrimSpace(buf.String())
+	return string(v)
 }

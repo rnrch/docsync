@@ -28,6 +28,19 @@ import (
 	"github.com/rnrch/rlog"
 )
 
+var defaultTemplate = `{{ define "folder" }}
+{{ .Depth | depthToHeader }} {{ .Name }}
+{{ range .Files }}
+[{{ .Name }}]({{ .Path }})
+{{ end }}
+{{- range .SubFolders }}
+{{- template "folder" . }}
+{{- end }}
+{{- end }}
+
+{{- template "folder" . -}}
+`
+
 type File struct {
 	Name string
 	Path string
@@ -42,8 +55,8 @@ type Folder struct {
 }
 
 type Options struct {
-	Templates []string `long:"template" short:"t" description:"template files" required:"true"`
-	Ignore    []string `long:"ignore" short:"i" description:"ignore files"`
+	Templates []string `long:"template" short:"t" description:"template files, the main template should be the first one"`
+	Ignore    []string `long:"ignore" short:"i" description:"ignored file/folder names"`
 	Output    string   `long:"output" short:"o" description:"output file name" default:"output.md"`
 	Directory string   `long:"directory" short:"d" description:"directory to process"`
 	Version   bool     `long:"version" short:"v" description:"show version info"`
@@ -62,7 +75,8 @@ func ParseFlags() Options {
 		os.Exit(code)
 	}
 	if options.Version {
-		fmt.Println(version.Info(path.Base(os.Args[0])))
+		fmt.Println(version.String())
+		os.Exit(0)
 	}
 	return options
 }
@@ -136,16 +150,22 @@ func write(folder Folder, templates []string, output string) error {
 	fm := template.FuncMap{
 		"depthToHeader": depthToHeader,
 	}
-	t, err := template.New(path.Base(templates[0])).Funcs(fm).ParseFiles(templates...)
+	var tmpl *template.Template
+	var err error
+	if len(templates) == 0 {
+		tmpl, err = template.New("tmpl").Funcs(fm).Parse(defaultTemplate)
+	} else {
+		tmpl, err = template.New(path.Base(templates[0])).Funcs(fm).ParseFiles(templates...)
+	}
 	if err != nil {
 		return err
 	}
 	out, err := os.Create(output)
-	defer out.Close()
 	if err != nil {
 		return err
 	}
-	return t.Execute(out, folder)
+	defer out.Close()
+	return tmpl.Execute(out, folder)
 }
 
 func depthToHeader(depth int) string {
