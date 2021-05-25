@@ -21,6 +21,6 @@ repo=$(basename -s .git "$(git config --get remote.origin.url)")
 source_path=$(cd "$(dirname "$0")" && cd .. && pwd)
 pushd "${source_path}" >/dev/null
 
-./bin/"${repo}" -t test/test.tmpl -i ignore -o test/output.md -d test/test-folder
+./bin/"${repo}" -t test/test.tmpl -i ignore -i ^[\.\w+] -o test/output.md -d test/test-folder
 
 popd >/dev/null
