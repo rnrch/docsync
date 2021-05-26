@@ -19,7 +19,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
-	"regexp"
 	"strings"
 	"text/template"
 
@@ -56,7 +55,8 @@ type Folder struct {
 
 type Options struct {
 	Templates []string `long:"template" short:"t" description:"template files, the main template should be the first one"`
-	Ignore    []string `long:"ignore" short:"i" description:"ignored file/folder names"`
+	Include   []string `long:"include" short:"i" description:"regexp for files to be included. If a file name does not match any of the patterns specified, it is ignored."`
+	Exclude   []string `long:"exclude" short:"e" description:"regexp for folders to be excluded. If a folder name matches one of the pattern specified, it and its contents are ignored."`
 	Output    string   `long:"output" short:"o" description:"output file name" default:"output.md"`
 	Directory string   `long:"directory" short:"d" description:"directory to process"`
 	Version   bool     `long:"version" short:"v" description:"show version info"`
@@ -93,9 +93,9 @@ func main() {
 	}
 	rlog.Info("Parsed options", "options", options)
 
-	f, err := processFolder(options.Directory, options.Ignore, 1)
+	f, err := processFolder(options.Directory, options.Include, options.Exclude, 1)
 	if err != nil {
-		rlog.Error(err, "process folder", "folder", options.Directory, "ignore", options.Ignore)
+		rlog.Error(err, "process folder", "folder", options.Directory)
 		os.Exit(1)
 	}
 
@@ -106,24 +106,27 @@ func main() {
 	}
 }
 
-func processFolder(folder string, ignore []string, depth int) (Folder, error) {
+func processFolder(folder string, include []string, exclude []string, depth int) (Folder, error) {
 	f := Folder{Path: folder, Name: path.Base(folder), Depth: depth}
 	contents, err := ioutil.ReadDir(folder)
 	if err != nil {
 		return f, err
 	}
 	for _, content := range contents {
-		if contains(ignore, content.Name()) {
-			continue
-		}
 		if !content.IsDir() {
+			if !contains(include, content.Name()) {
+				continue
+			}
 			f.Files = append(f.Files, File{
 				Name: content.Name(),
 				Path: path.Join(folder, content.Name()),
 			})
 			continue
 		}
-		sub, err := processFolder(path.Join(folder, content.Name()), ignore, depth+1)
+		if contains(exclude, content.Name()) {
+			continue
+		}
+		sub, err := processFolder(path.Join(folder, content.Name()), include, exclude, depth+1)
 		if err != nil {
 			return f, err
 		}
@@ -134,9 +137,9 @@ func processFolder(folder string, ignore []string, depth int) (Folder, error) {
 
 func contains(set []string, value string) bool {
 	for _, s := range set {
-		match, err := regexp.MatchString(s, value)
+		match, err := path.Match(s, value)
 		if err != nil {
-			rlog.Error(err, "regexp match")
+			rlog.Error(err, "match path", "pattern", s, "value", value)
 			continue
 		}
 		if match {

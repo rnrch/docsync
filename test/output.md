@@ -1,24 +1,20 @@
 
 # test-folder
 
-[hello-world](test/test-folder/hello-world)
-
-[rootfile](test/test-folder/rootfile)
+[hello-world.md](test/test-folder/hello-world.md)
 
 ## sub1
 
-[sub1-data](test/test-folder/sub1/sub1-data)
+[sub1-data.md](test/test-folder/sub1/sub1-data.md)
 
 ### alice
 
-[alice-book](test/test-folder/sub1/alice/alice-book)
-
-[alice-diary](test/test-folder/sub1/alice/alice-diary)
+[alice-book.md](test/test-folder/sub1/alice/alice-book.md)
 
 #### empty
 
 ### bob
 
-[soccer](test/test-folder/sub1/bob/soccer)
+[soccer.md](test/test-folder/sub1/bob/soccer.md)
 
 ## sub2
