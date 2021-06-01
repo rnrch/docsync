@@ -35,6 +35,6 @@ ldflags="
   -X ${repo_path}/pkg/version.BuildDate=${date}"
 
 echo "Building with -ldflags $ldflags"
-go build -ldflags "${ldflags}" -o "${source_path}/bin/${repo}" "${source_path}/cmd/docsync"
+go build -ldflags "${ldflags}" -o "${source_path}/bin/${repo}" "${source_path}/cmd/${repo}"
 
 popd >/dev/null
