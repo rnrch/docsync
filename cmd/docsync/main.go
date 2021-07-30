@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 	"text/template"
 
@@ -107,7 +107,7 @@ func main() {
 }
 
 func processFolder(folder string, include []string, exclude []string, depth int) (Folder, error) {
-	f := Folder{Path: folder, Name: path.Base(folder), Depth: depth}
+	f := Folder{Path: folder, Name: filepath.Base(folder), Depth: depth}
 	contents, err := ioutil.ReadDir(folder)
 	if err != nil {
 		return f, err
@@ -117,16 +117,17 @@ func processFolder(folder string, include []string, exclude []string, depth int)
 			if !contains(include, content.Name()) {
 				continue
 			}
+			n := strings.TrimSuffix(content.Name(), filepath.Ext(content.Name()))
 			f.Files = append(f.Files, File{
-				Name: content.Name(),
-				Path: path.Join(folder, content.Name()),
+				Name: n,
+				Path: filepath.Join(folder, content.Name()),
 			})
 			continue
 		}
 		if contains(exclude, content.Name()) {
 			continue
 		}
-		sub, err := processFolder(path.Join(folder, content.Name()), include, exclude, depth+1)
+		sub, err := processFolder(filepath.Join(folder, content.Name()), include, exclude, depth+1)
 		if err != nil {
 			return f, err
 		}
@@ -137,7 +138,7 @@ func processFolder(folder string, include []string, exclude []string, depth int)
 
 func contains(set []string, value string) bool {
 	for _, s := range set {
-		match, err := path.Match(s, value)
+		match, err := filepath.Match(s, value)
 		if err != nil {
 			rlog.Error(err, "match path", "pattern", s, "value", value)
 			continue
@@ -158,7 +159,7 @@ func write(folder Folder, templates []string, output string) error {
 	if len(templates) == 0 {
 		tmpl, err = template.New("tmpl").Funcs(fm).Parse(defaultTemplate)
 	} else {
-		tmpl, err = template.New(path.Base(templates[0])).Funcs(fm).ParseFiles(templates...)
+		tmpl, err = template.New(filepath.Base(templates[0])).Funcs(fm).ParseFiles(templates...)
 	}
 	if err != nil {
 		return err
