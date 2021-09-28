@@ -55,8 +55,8 @@ type Folder struct {
 
 type Options struct {
 	Templates []string `long:"template" short:"t" description:"template files, the main template should be the first one"`
-	Include   []string `long:"include" short:"i" description:"regexp for files to be included. If a file name does not match any of the patterns specified, it is ignored."`
-	Exclude   []string `long:"exclude" short:"e" description:"regexp for folders to be excluded. If a folder name matches one of the pattern specified, it and its contents are ignored."`
+	Include   []string `long:"include" short:"i" description:"files to be included. If a file name does not match any of the patterns specified, it is ignored."`
+	Exclude   []string `long:"exclude" short:"e" description:"files and folders to be excluded. Priority higher than include flag."`
 	Output    string   `long:"output" short:"o" description:"output file name" default:"output.md"`
 	Directory string   `long:"directory" short:"d" description:"directory to process"`
 	Version   bool     `long:"version" short:"v" description:"show version info"`
@@ -114,6 +114,9 @@ func processFolder(folder string, include []string, exclude []string, depth int)
 	}
 	for _, content := range contents {
 		if !content.IsDir() {
+			if contains(exclude, content.Name()) {
+				continue
+			}
 			if !contains(include, content.Name()) {
 				continue
 			}
