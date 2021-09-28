@@ -7,7 +7,7 @@ a tool to write folder structure to markdown files
 e.g.
 
 ```bash
-./docsync -t test/test.tmpl -i ignore -o test/output.md -d test/test-folder
+cd test && docsync -t test.tmpl -e ignore -e output.md -i "*.md" -o output.md -d .
 ```
 
 [example output](test/output.md)

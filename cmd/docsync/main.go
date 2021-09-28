@@ -17,6 +17,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -156,6 +157,7 @@ func contains(set []string, value string) bool {
 func write(folder Folder, templates []string, output string) error {
 	fm := template.FuncMap{
 		"depthToHeader": depthToHeader,
+		"processPwd":    processPwd,
 	}
 	var tmpl *template.Template
 	var err error
@@ -177,4 +179,16 @@ func write(folder Folder, templates []string, output string) error {
 
 func depthToHeader(depth int) string {
 	return strings.Repeat("#", depth)
+}
+
+func processPwd(name string) string {
+	if name == "." {
+		pwd, err := os.Getwd()
+		if err != nil {
+			log.Printf("get wd err %v", err)
+			return name
+		}
+		return filepath.Base(pwd)
+	}
+	return name
 }

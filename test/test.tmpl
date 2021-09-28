@@ -1,5 +1,5 @@
 {{ define "folder" }}
-{{ .Depth | depthToHeader }} {{ .Name }}
+{{ .Depth | depthToHeader }} {{ .Name | processPwd }}
 {{ range .Files }}
 [{{ .Name }}]({{ .Path }})
 {{ end }}
