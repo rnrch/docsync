@@ -1,6 +1,7 @@
 build: clean
-	@echo "Begin to build binary"
 	./hack/build.sh
+	mv bin/docsync ~/.local/go/bin/
+	docsync -v
 .PHONY: build
 
 addlicense:
@@ -13,6 +14,5 @@ clean:
 .PHONY: clean
 
 test: build
-	@echo "Begin to run test"
 	./hack/test.sh
 .PHONY: test
