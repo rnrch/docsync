@@ -23,7 +23,7 @@ repo_path=github.com/rnrch/"${repo}"
 source_path=$(cd "$(dirname "$0")" && cd .. && pwd)
 pushd "$source_path" >/dev/null
 
-date=$(date "+%Y%m%d-%H:%M:%S")
+date=$(date "+%Y-%m-%d")
 version=$(git describe --tags --dirty 2>/dev/null || echo 'unknown')
 revision=$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown')
 branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo 'unknown')

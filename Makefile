@@ -4,7 +4,7 @@ build: clean
 .PHONY: build
 
 addlicense:
-	# install with `go get github.com/google/addlicense`
+	@# install with `go install github.com/google/addlicense`
 	addlicense -c 'rnrch' -l apache -v .
 .PHONY: addlicense
 
