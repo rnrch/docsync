@@ -22,6 +22,7 @@ import (
 	"path/filepath"
 	"strings"
 	"text/template"
+	"unicode"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/rnrch/docsync/pkg/version"
@@ -124,7 +125,7 @@ func processFolder(folder string, include []string, exclude []string, depth int)
 			n := strings.TrimSuffix(content.Name(), filepath.Ext(content.Name()))
 			f.Files = append(f.Files, File{
 				Name: n,
-				Path: filepath.Join(folder, url.PathEscape(content.Name())),
+				Path: filepath.Join(folder, URLEncode(content.Name())),
 			})
 			continue
 		}
@@ -191,4 +192,16 @@ func processPwd(name string) string {
 		return filepath.Base(pwd)
 	}
 	return name
+}
+
+func URLEncode(str string) string {
+	var builder strings.Builder
+	for _, r := range str {
+		if unicode.Is(unicode.Han, r) {
+			builder.WriteRune(r)
+		} else {
+			builder.WriteString(url.PathEscape(string(r)))
+		}
+	}
+	return builder.String()
 }
