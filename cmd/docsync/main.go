@@ -16,8 +16,8 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -109,7 +109,7 @@ func main() {
 
 func processFolder(folder string, include []string, exclude []string, depth int) (Folder, error) {
 	f := Folder{Path: folder, Name: filepath.Base(folder), Depth: depth}
-	contents, err := ioutil.ReadDir(folder)
+	contents, err := os.ReadDir(folder)
 	if err != nil {
 		return f, err
 	}
@@ -124,7 +124,7 @@ func processFolder(folder string, include []string, exclude []string, depth int)
 			n := strings.TrimSuffix(content.Name(), filepath.Ext(content.Name()))
 			f.Files = append(f.Files, File{
 				Name: n,
-				Path: filepath.Join(folder, content.Name()),
+				Path: filepath.Join(folder, url.PathEscape(content.Name())),
 			})
 			continue
 		}

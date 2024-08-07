@@ -1,7 +1,6 @@
 build: clean
 	./hack/build.sh
-	mv bin/docsync ~/.local/go/bin/
-	docsync -v
+	./bin/docsync -v
 .PHONY: build
 
 addlicense:

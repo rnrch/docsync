@@ -3,7 +3,7 @@
 
 ## test-folder
 
-[hello-world](test-folder/hello-world.md)
+[hello world](test-folder/hello%20world.md)
 
 ### sub1
 
